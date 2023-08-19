@@ -10,6 +10,6 @@ int main()
         prompt();
         char input[4096];
         fgets(input, 4096, stdin);
-        ProcessInput(input, 4096);
+        SplitStrings(input, 4096);
     }
 }

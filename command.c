@@ -1,7 +1,24 @@
 #include "headers.h"
 
+void ExecuteCommand(char **Arguments)
+{
+    int ex = fork();
+    if (ex == 0)
+    {
+        int res = execvp(Arguments[0], Arguments);
+        if (res == -1)
+        {
+            printf("ded\n");
+        }
+    }
+    else
+    {
+        int y;
+        waitpid(ex, &y, 0);
+    }
+}
 
-void ProcessInput(char *Input, const int InputLength)
+void ProcessInput(char *Input, int Flag)
 {
     char Delimiters[5] = "\n\t ";
 
@@ -18,19 +35,23 @@ void ProcessInput(char *Input, const int InputLength)
         token = strtok(NULL, Delimiters);
     }
     argv[index] = NULL;
-    int ex = fork();
-    if (ex == 0)
+    ExecuteCommand(argv);
+}
+
+void SplitStrings(char *InputString, const int InputLength)
+{
+
+    int StringStart = 0;
+
+    for (int index = 0; InputString[index] != '\0'; index++)
     {
-        int res = execvp(argv[0], argv);
-        if (res == -1)
+        if (InputString[index] == '&' || InputString[index] == ';')
         {
-            printf("ded\n");
+            int flag = (InputString[index] == '&');
+            InputString[index] = '\0';
+            ProcessInput(&InputString[StringStart], flag);
+            StringStart = index + 1;
         }
     }
-    else
-    {
-        int y;
-        waitpid(ex, &y, 0);
-    }
-    
+    ProcessInput(&InputString[StringStart], 0);
 }

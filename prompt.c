@@ -38,9 +38,9 @@ void GetCurrentLocation(char *buffer, const int BufferLength)
     if (RelativeIndex == -1)
         return;
     buffer[0] = '~';
-    for (int i = 1; i + RelativeIndex < BufferLength; i++)
+    for (int i = 1; i + RelativeIndex-1 < BufferLength; i++)
     {
-        buffer[i] = buffer[i + RelativeIndex];
+        buffer[i] = buffer[i + RelativeIndex-1];
         if (buffer[i] == '\0')
             return;
     }
