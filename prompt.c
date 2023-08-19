@@ -46,13 +46,32 @@ void GetCurrentLocation(char *buffer, const int BufferLength)
     }
 }
 
+void GetHostName(char* Buffer, const int BufferLength) {
+    if (gethostname(Buffer, BufferLength) == -1) {
+        fprintf(stderr, "Unable to get host name!\n");
+        exit(errno);
+    }
+}
+
+char* GetUserName(void) {
+    char* UserName = getlogin();
+    if (UserName == NULL) {
+        fprintf(stderr, "Unable to get username!\n");
+        exit(errno);
+    }
+    return UserName;
+}
+
 void prompt()
 {
     // Do not hardcode the prmopt
     char SYSname[BUFFERLENGTH];
-    int SYSstatus = gethostname(SYSname, BUFFERLENGTH);
-    char *USER = getlogin();
+    GetHostName(SYSname, BUFFERLENGTH);
+
+    char *User = GetUserName();
+
     char CurrentDir[BUFFERLENGTH];
     GetCurrentLocation(CurrentDir, BUFFERLENGTH);
-    printf("<%s@%s:%s> ", USER, SYSname, CurrentDir);
+
+    printf("<%s@%s:%s> ", User, SYSname, CurrentDir);
 }

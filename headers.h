@@ -5,9 +5,12 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <error.h>
+#include <wait.h>
+#include <errno.h>
+#include <string.h>
 
 #include "prompt.h"
+#include "command.h"
 
 #define BUFFERLENGTH 256
 
