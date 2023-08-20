@@ -11,6 +11,8 @@
 
 #include "prompt.h"
 #include "command.h"
+#include "warp.h"
+#include "peek.h"
 
 #define BUFFERLENGTH 256
 
