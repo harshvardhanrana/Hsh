@@ -1,6 +1,6 @@
 #ifndef __PEEK_H
 #define __PEEK_H
 
-void peek();
+void ProcessPeek();
 
 #endif

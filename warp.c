@@ -1,6 +1,6 @@
 #include "headers.h"
 
-char PrevDirectory[128] = {'\0'};
+char PrevDirectory[BUFFERLENGTH] = {'\0'};
 int Used = 0;
 
 extern char ShellStartLocation[BUFFERLENGTH];
@@ -14,12 +14,17 @@ int WarpSeperate(const char* Location) {
     if (strcmp(Location, "-") == 0) {
         if (Used)
             status = chdir(PrevDirectory);
+        else {
+            printf("OLDPWD Not Set!\n");
+        }
     }
     else if (strcmp(Location, "~") == 0) {
         status = chdir(ShellStartLocation);
+        Used = 1;
     }
     else {
         status = chdir(Location);
+        Used = 1;
     }
     
     if (status != 0) {

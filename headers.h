@@ -8,6 +8,8 @@
 #include <wait.h>
 #include <errno.h>
 #include <string.h>
+#include <dirent.h>
+ #include <sys/stat.h>
 
 #include "prompt.h"
 #include "command.h"

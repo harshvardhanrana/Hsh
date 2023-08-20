@@ -54,7 +54,7 @@ void ProcessInput(char *Input, int Flag)
     if (strcmp(argv[0],"warp") == 0)
         warp(argv);
     else if (strcmp(argv[0],"peek") == 0)
-        peek(argv);
+        ProcessPeek(argv);
     else if (Flag == 0) 
         ExecuteForegroundCommand(argv);
     else
