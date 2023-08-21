@@ -27,13 +27,7 @@ int RelativeLocationIndex(const char *buffer, const int BufferLength)
         return -1;
 }
 
-void GetCurrentLocation(char *buffer, const int BufferLength)
-{
-    if (getcwd(buffer, BufferLength) == NULL)
-    {
-        fprintf(stderr, "Current Location Invalid!\n");
-        exit(EXIT_FAILURE);
-    }
+void MakeRelative(char *buffer, const int BufferLength) {
     int RelativeIndex = RelativeLocationIndex(buffer, BufferLength);
     if (RelativeIndex == -1)
         return;
@@ -44,6 +38,16 @@ void GetCurrentLocation(char *buffer, const int BufferLength)
         if (buffer[i] == '\0')
             return;
     }
+}
+
+void GetCurrentLocation(char *buffer, const int BufferLength)
+{
+    if (getcwd(buffer, BufferLength) == NULL)
+    {
+        fprintf(stderr, "Current Location Invalid!\n");
+        exit(EXIT_FAILURE);
+    }
+    MakeRelative(buffer, BufferLength);
 }
 
 void GetHostName(char* Buffer, const int BufferLength) {

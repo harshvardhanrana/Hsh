@@ -20,6 +20,7 @@
 #include "peek.h"
 #include "pastevents.h"
 #include "utils.h"
+#include "proclore.h"
 
 #define BUFFERLENGTH 256
 

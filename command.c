@@ -28,9 +28,9 @@ void ExecuteBackgroundCommand(char **Arguments) {
             printf("ERROR: '%s' is not a valid command\n", Arguments[0]);
         }
     }
-    // else {
-    //     printf("%d\n", ex);
-    // }
+    else {
+        printf("%d\n", ex);
+    }
 }
 
 int IsPastEvent = 0;
@@ -66,7 +66,7 @@ void ProcessInput(char *Input, int Flag, char* OriginalInput)
     else if (strcmp(argv[0],"peek") == 0)
         ProcessPeek(argv);
     else if (strcmp(argv[0],"proclore") == 0)
-        Proclore(argv);
+        Proclore(argv[1]);
     else if (strcmp(argv[0], "pastevents") == 0) {
         if (argv[1] == NULL || strcmp(argv[1],"execute")) {
             IsPastEvent = 1;

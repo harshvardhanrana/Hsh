@@ -5,6 +5,23 @@ int Start = 0;
 int NumElems = 0;
 int PastEventError = 0;
 
+
+void WriteIntoFile() {
+    FILE* fptr = fopen("pasthistory.bin", "w");
+    fwrite(&NumElems, sizeof(int), 1, fptr);
+    for (int i=0; i<NumElems; i++) {
+        fwrite(Pastevents[(Start + i)%15], 4096*sizeof(char), 1, fptr);
+    }
+}
+
+void ReadFromFile() {
+    FILE* fptr = fopen("pasthistory.bin", "r");
+    fread(&NumElems, sizeof(int), 1, fptr);
+    for (int i=0; i<NumElems; i++) {
+        fread(Pastevents[i], 4096*sizeof(char), 1, fptr);
+    }
+}
+
 void PrintPast()
 {
     if (NumElems == 0)
@@ -35,19 +52,26 @@ void PastExecute(char *IndexStr, char* BigString, char* ToReplace)
     StringReplace(BigString, ToReplace, Pastevents[RealIndex%15]);
 }
 
+
 void ProcessPast(char **Arguments, char* OriginalString, char* TokenString)
 {
     if (Arguments[1] == NULL)
         PrintPast();
-    else if (strcmp(Arguments[1], "purge") == 0)
+    else if (strcmp(Arguments[1], "purge") == 0) {
         NumElems = 0;
+        WriteIntoFile();
+    }
     else if (strcmp(Arguments[1], "execute") == 0)
         PastExecute(Arguments[2], OriginalString, TokenString);
 }
 
 void AddHistory(char* InputString) {
     strcpy(Pastevents[(Start+NumElems)%15], InputString);
-    NumElems++;
+    if (NumElems < 15)
+        NumElems++;
+    else 
+        Start = (Start+1)%15;
+    WriteIntoFile();
 }
 
 void RemoveLastPast() {

@@ -3,6 +3,7 @@
 int main()
 {
     SetShellStartLocation();
+    ReadFromFile();
     // Keep accepting commands
     while (1)
     {

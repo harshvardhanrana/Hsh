@@ -5,5 +5,6 @@ void ProcessPast();
 void AddHistory();
 void RemoveLastPast();
 int CheckPastEvent(const char*);
+void ReadFromFile();
 
 #endif
