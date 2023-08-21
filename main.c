@@ -10,6 +10,7 @@ int main()
         prompt();
         char input[4096];
         fgets(input, 4096, stdin);
-        SplitStrings(input, 4096);
+        input[strcspn(input, "\n")] = '\0';
+        SplitStrings(input, 4096, 0);
     }
 }

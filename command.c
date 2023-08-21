@@ -33,13 +33,19 @@ void ExecuteBackgroundCommand(char **Arguments) {
     // }
 }
 
-void ProcessInput(char *Input, int Flag)
+int IsPastEvent = 0;
+extern int PastEventError;
+
+void ProcessInput(char *Input, int Flag, char* OriginalInput)
 {
     char Delimiters[5] = "\n\t ";
 
     char Command[256];
     char *argv[256];
     int index = 0;
+
+    char InputTemp[256];
+    strcpy(InputTemp, Input);
 
     char *token = strtok(Input, Delimiters);
 
@@ -51,20 +57,36 @@ void ProcessInput(char *Input, int Flag)
     }
     argv[index] = NULL;
 
+    if (argv[0] == NULL) {
+        return;
+    }
+
     if (strcmp(argv[0],"warp") == 0)
         warp(argv);
     else if (strcmp(argv[0],"peek") == 0)
         ProcessPeek(argv);
+    else if (strcmp(argv[0],"proclore") == 0)
+        Proclore(argv);
+    else if (strcmp(argv[0], "pastevents") == 0) {
+        if (argv[1] == NULL || strcmp(argv[1],"execute")) {
+            IsPastEvent = 1;
+        }
+        ProcessPast(argv, OriginalInput, InputTemp);
+    }
     else if (Flag == 0) 
         ExecuteForegroundCommand(argv);
     else
         ExecuteBackgroundCommand(argv);
 }
 
-void SplitStrings(char *InputString, const int InputLength)
+void SplitStrings(char *InputString, const int InputLength, int IsCalled)
 {
-
+    
+    char temp[4096];
+    strcpy(temp, InputString);
     int StringStart = 0;
+    IsPastEvent = 0;
+    PastEventError = 0;
 
     for (int index = 0; InputString[index] != '\0'; index++)
     {
@@ -72,9 +94,12 @@ void SplitStrings(char *InputString, const int InputLength)
         {
             int flag = (InputString[index] == '&');
             InputString[index] = '\0';
-            ProcessInput(&InputString[StringStart], flag);
+            ProcessInput(&InputString[StringStart], flag, temp);
             StringStart = index + 1;
         }
     }
-    ProcessInput(&InputString[StringStart], 0);
+    ProcessInput(&InputString[StringStart], 0, temp);
+    if (!IsPastEvent && !CheckPastEvent(temp) && !IsCalled && !PastEventError)
+        AddHistory(temp);
+
 }

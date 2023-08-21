@@ -18,6 +18,8 @@
 #include "command.h"
 #include "warp.h"
 #include "peek.h"
+#include "pastevents.h"
+#include "utils.h"
 
 #define BUFFERLENGTH 256
 
