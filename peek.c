@@ -98,11 +98,11 @@ void ProcessPeek(char **Arguments)
     {
         for (int i = 1; Arguments[1][i] != '\0'; i++)
         {
-            if (Arguments[1][i] == 'a')
+            if (Arguments[flagindex][i] == 'a')
             {
                 flaga = 1;
             }
-            else if (Arguments[1][i] == 'l')
+            else if (Arguments[flagindex][i] == 'l')
             {
                 flagl = 1;
             }
