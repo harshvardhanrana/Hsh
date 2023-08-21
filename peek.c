@@ -5,13 +5,39 @@ extern int Used;
 
 extern char ShellStartLocation[BUFFERLENGTH];
 
+void PrintPermission(struct stat fileinfo) {
+    printf( (S_ISDIR(fileinfo.st_mode)) ? "d" : "-");
+    printf( (fileinfo.st_mode & S_IRUSR) ? "r" : "-");
+    printf( (fileinfo.st_mode & S_IWUSR) ? "w" : "-");
+    printf( (fileinfo.st_mode & S_IXUSR) ? "x" : "-");
+    printf( (fileinfo.st_mode & S_IRGRP) ? "r" : "-");
+    printf( (fileinfo.st_mode & S_IWGRP) ? "w" : "-");
+    printf( (fileinfo.st_mode & S_IXGRP) ? "x" : "-");
+    printf( (fileinfo.st_mode & S_IROTH) ? "r" : "-");
+    printf( (fileinfo.st_mode & S_IWOTH) ? "w" : "-");
+    printf( (fileinfo.st_mode & S_IXOTH) ? "x " : "- ");
+
+}
+
 void PrintStatistic(char* directory, char* file) {
     char file_location[BUFFERLENGTH];
     strcpy(file_location, directory);
     strcat(file_location, "/");
     strcat(file_location, file);
     struct stat fileinfo;
-    
+    stat(file_location, &fileinfo);
+    PrintPermission(fileinfo);
+    printf("%3ld ", fileinfo.st_nlink);
+    printf("%15s ", getpwuid(fileinfo.st_uid)->pw_name);
+    printf("%15s ", getgrgid(fileinfo.st_gid)->gr_name);
+    printf("%13ld ", fileinfo.st_size);
+    char date[64];
+    if (time(0) - fileinfo.st_mtime >= 6*31*24*60*60)
+        strftime(date, 64, "%b %d  %Y", localtime(&(fileinfo.st_mtime)));
+    else
+        strftime(date, 64, "%b %d %H:%M", localtime(&(fileinfo.st_mtime)));
+    printf("%s ",date);
+    printf("%s\n",file);
 }
 
 void PeekHandle(char *Location, int flaga, int flagl)
@@ -50,7 +76,7 @@ void PeekHandle(char *Location, int flaga, int flagl)
         while ((en = readdir(directory)) != NULL)
         {
             if (flaga || (*en->d_name != '.'))
-                if (flagl)
+                if (!flagl)
                     printf("%s\n", en->d_name);
                 else
                     PrintStatistic(temp, en->d_name);
