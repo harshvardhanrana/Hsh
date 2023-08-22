@@ -70,21 +70,32 @@ void PeekHandle(char *Location, int flaga, int flagl)
 
     DIR *directory;
     struct dirent *en;
-    directory = opendir(temp);
-    if (directory)
-    {
-        while ((en = readdir(directory)) != NULL)
-        {
-            if (flaga || (*en->d_name != '.'))
-                if (!flagl)
-                    printf("%s\n", en->d_name);
-                else
-                    PrintStatistic(temp, en->d_name);
-        }
-        closedir(directory);
-    }
-    else {
-        printf("Invalid Location: %s\n", Location);
+    struct dirent **files;
+    int numfiles = scandir(temp, &files, NULL, alphasort);
+    int index = 0;
+    // if (directory)
+    // {
+    //     while ((en = readdir(directory)) != NULL)
+    //     {
+    //         if (flaga || (*en->d_name != '.'))
+    //             if (!flagl)
+    //                 printf("%s\n", en->d_name);
+    //             else
+    //                 PrintStatistic(temp, en->d_name);
+    //     }
+    //     closedir(directory);
+    // }
+    // else {
+    //     printf("Invalid Location: %s\n", Location);
+    // }
+    while (index < numfiles) {
+        en = files[index];
+        if (flaga || (*en->d_name != '.'))
+            if (!flagl)
+                printf("%s\n", en->d_name);
+            else
+                PrintStatistic(temp, en->d_name);
+        index++;
     }
 }
 

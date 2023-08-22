@@ -13,9 +13,13 @@
 #include <pwd.h>
 #include <grp.h>
 #include <time.h>
+#include <assert.h>
+#include <sys/types.h>
+#include <signal.h>
 
 #include "prompt.h"
 #include "command.h"
+#include "backgroundproc.h"
 #include "warp.h"
 #include "peek.h"
 #include "pastevents.h"

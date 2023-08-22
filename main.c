@@ -12,6 +12,7 @@ int main()
         char input[4096];
         fgets(input, 4096, stdin);
         input[strcspn(input, "\n")] = '\0';
+        RemoveBackgroundBuffers();
         SplitStrings(input, 4096, 0);
     }
 }

@@ -1,5 +1,6 @@
 #include "headers.h"
 
+
 void ExecuteForegroundCommand(char **Arguments)
 {
     int ex = fork();
@@ -18,6 +19,7 @@ void ExecuteForegroundCommand(char **Arguments)
     }
 }
 
+
 void ExecuteBackgroundCommand(char **Arguments) {
     int ex = fork();
     if (ex == 0)
@@ -29,6 +31,7 @@ void ExecuteBackgroundCommand(char **Arguments) {
         }
     }
     else {
+        AddBackgroundProcess(Arguments[0], ex);
         printf("%d\n", ex);
     }
 }
@@ -81,7 +84,6 @@ void ProcessInput(char *Input, int Flag, char* OriginalInput)
 
 void SplitStrings(char *InputString, const int InputLength, int IsCalled)
 {
-    
     char temp[4096];
     strcpy(temp, InputString);
     int StringStart = 0;

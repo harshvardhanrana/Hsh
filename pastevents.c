@@ -12,6 +12,7 @@ void WriteIntoFile() {
     for (int i=0; i<NumElems; i++) {
         fwrite(Pastevents[(Start + i)%15], 4096*sizeof(char), 1, fptr);
     }
+    fclose(fptr);
 }
 
 void ReadFromFile() {
@@ -20,6 +21,7 @@ void ReadFromFile() {
     for (int i=0; i<NumElems; i++) {
         fread(Pastevents[i], 4096*sizeof(char), 1, fptr);
     }
+    fclose(fptr);
 }
 
 void PrintPast()
