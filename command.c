@@ -70,6 +70,8 @@ void ProcessInput(char *Input, int Flag, char* OriginalInput)
         ProcessPeek(argv);
     else if (strcmp(argv[0],"proclore") == 0)
         Proclore(argv[1]);
+    else if (strcmp(argv[0], "seek") == 0)
+        seek(argv);
     else if (strcmp(argv[0], "pastevents") == 0) {
         if (argv[1] == NULL || strcmp(argv[1],"execute")) {
             IsPastEvent = 1;

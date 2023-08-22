@@ -25,6 +25,7 @@
 #include "pastevents.h"
 #include "utils.h"
 #include "proclore.h"
+#include "seek.h"
 
 #define BUFFERLENGTH 256
 
