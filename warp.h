@@ -2,5 +2,6 @@
 #define __WARP_H
 
 void warp(char**);
+int WarpSeperate(const char* Location);
 
 #endif

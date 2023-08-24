@@ -14,8 +14,15 @@ void ExecuteForegroundCommand(char **Arguments)
     }
     else
     {
+        time_t start,end;
+        start = time(NULL);
         int y;
         waitpid(ex, &y, 0);
+        end = time(NULL);
+        int execution_time = ((int)(end - start));
+        if (execution_time >= 2) {
+            AddForegroundProc(Arguments[0], execution_time);
+        }
     }
 }
 

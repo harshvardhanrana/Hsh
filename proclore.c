@@ -47,7 +47,7 @@ void Proclore(char* Argument) {
     fscanf(fptr, "%d %d %lu", &dummy1, &dummy1, &virtualmemory);
     
     printf("process status : %c", state);
-    if (getpgrp() == grpid) {
+    if (getpid() == procid) {
         printf("+");
     }
     printf("\n");

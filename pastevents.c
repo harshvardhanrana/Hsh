@@ -1,5 +1,7 @@
 #include "headers.h"
 
+extern char ShellStartLocation[BUFFERLENGTH];
+
 char Pastevents[15][4096];
 int Start = 0;
 int NumElems = 0;
@@ -7,7 +9,10 @@ int PastEventError = 0;
 
 
 void WriteIntoFile() {
-    FILE* fptr = fopen("pasthistory.bin", "w");
+    char pasthistorypath[BUFFERLENGTH];
+    strcpy(pasthistorypath, ShellStartLocation);
+    strcat(pasthistorypath, "/pasthistory.bin");
+    FILE* fptr = fopen(pasthistorypath, "w");
     fwrite(&NumElems, sizeof(int), 1, fptr);
     for (int i=0; i<NumElems; i++) {
         fwrite(Pastevents[(Start + i)%15], 4096*sizeof(char), 1, fptr);
@@ -16,10 +21,18 @@ void WriteIntoFile() {
 }
 
 void ReadFromFile() {
-    FILE* fptr = fopen("pasthistory.bin", "r");
+    char pasthistorypath[BUFFERLENGTH];
+    strcpy(pasthistorypath, ShellStartLocation);
+    strcat(pasthistorypath, "/pasthistory.bin");
+    FILE* fptr = fopen(pasthistorypath, "r");
+    if (fptr == NULL) {
+        NumElems = 0;
+        return;
+    }
     fread(&NumElems, sizeof(int), 1, fptr);
     for (int i=0; i<NumElems; i++) {
         fread(Pastevents[i], 4096*sizeof(char), 1, fptr);
+        printf("%d-%s\n",i, Pastevents[i]);
     }
     fclose(fptr);
 }
@@ -31,6 +44,7 @@ void PrintPast()
     for (int i = 0; i < NumElems; i++)
     {
         printf("%s\n", Pastevents[(Start + i) % 15]);
+        printf("%d\n", (Start + i) % 15);
     }
 }
 
@@ -43,7 +57,9 @@ void PastExecute(char *IndexStr, char* BigString, char* ToReplace)
         Index += (int)(IndexStr[i] - '0');
     }
     if (Index > NumElems) {
-        printf("Invalid Index\n");
+        char ErrorMessage[BUFFERLENGTH];
+        snprintf(ErrorMessage, BUFFERLENGTH, "Invalid Index: %d", Index);
+        PrintError(ErrorMessage);
         PastEventError = 1;
         return;
     }
@@ -65,6 +81,11 @@ void ProcessPast(char **Arguments, char* OriginalString, char* TokenString)
     }
     else if (strcmp(Arguments[1], "execute") == 0)
         PastExecute(Arguments[2], OriginalString, TokenString);
+    else {
+        char ErrorMessage[BUFFERLENGTH];
+        snprintf(ErrorMessage, BUFFERLENGTH, "Invalid Argument: %s", Arguments[1]);
+        PrintError(ErrorMessage);
+    }
 }
 
 void AddHistory(char* InputString) {

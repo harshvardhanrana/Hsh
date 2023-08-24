@@ -25,7 +25,10 @@ void PrintStatistic(char* directory, char* file) {
     strcat(file_location, "/");
     strcat(file_location, file);
     struct stat fileinfo;
-    stat(file_location, &fileinfo);
+    if (stat(file_location, &fileinfo) == -1) {
+        printf("Unable to Call Stat for %s!\n", file_location);
+        return;
+    }
     PrintPermission(fileinfo);
     printf("%3ld ", fileinfo.st_nlink);
     printf("%15s ", getpwuid(fileinfo.st_uid)->pw_name);
@@ -73,21 +76,10 @@ void PeekHandle(char *Location, int flaga, int flagl)
     struct dirent **files;
     int numfiles = scandir(temp, &files, NULL, alphasort);
     int index = 0;
-    // if (directory)
-    // {
-    //     while ((en = readdir(directory)) != NULL)
-    //     {
-    //         if (flaga || (*en->d_name != '.'))
-    //             if (!flagl)
-    //                 printf("%s\n", en->d_name);
-    //             else
-    //                 PrintStatistic(temp, en->d_name);
-    //     }
-    //     closedir(directory);
-    // }
-    // else {
-    //     printf("Invalid Location: %s\n", Location);
-    // }
+    if (numfiles < 0) {
+        printf("Unable to access scandir\n");
+        return;
+    }
     while (index < numfiles) {
         en = files[index];
         if (flaga || (*en->d_name != '.'))
@@ -119,7 +111,8 @@ void ProcessPeek(char **Arguments)
             }
             else
             {
-                // Error Handle
+                printf("Invalid Flag Found!\n");
+                return;
             }
         }
         flagindex++;

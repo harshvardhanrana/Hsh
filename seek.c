@@ -3,6 +3,8 @@
 char FilesBuffer[50][BUFFERLENGTH];
 int NumFound = 0;
 
+extern char ShellStartLocation[BUFFERLENGTH];
+
 int IsDirectory(const char* location) {
     struct stat st;
     stat(location, &st);
@@ -28,6 +30,11 @@ void seekdfs(const char* name_search, const char* direc, int flagd, int flagf) {
     struct dirent *en;
     struct dirent **files;
     int numfiles = scandir(direc, &files, NULL, alphasort);
+    if (numfiles < 0) {
+        printf("Unable to execute scandir on directory: %s\n", direc);
+        NumFound = -1;
+        return;
+    }
     int index = 0;
 
     while (index < numfiles) {
@@ -46,6 +53,8 @@ void seekdfs(const char* name_search, const char* direc, int flagd, int flagf) {
                 NumFound++;
             }
             seekdfs(name_search, filepath, flagd, flagf);
+            if (NumFound < 0)
+                return;
         }
         else if (flagf && FileNameComp(name_search, en->d_name)) {
             strcpy(FilesBuffer[NumFound], filepath);
@@ -79,7 +88,8 @@ void seek(char **Arguments) {
                 flage = 1;
             }
             else {
-                // Error Handle
+                printf("Invalid Flag Found!\n");
+                return;
             }
         }
         flagindex++;
@@ -100,9 +110,44 @@ void seek(char **Arguments) {
         seekdfs(Arguments[flagindex], ".", flagd, flagf);
     }
     else {
+        if (Arguments[flagindex+1][0] == '~') {
+            char temp[BUFFERLENGTH];
+            strcpy(temp, ShellStartLocation);
+            strcat(temp, &Arguments[flagindex+1][1]);
+            strcpy(Arguments[flagindex+1], temp);
+        }
         seekdfs(Arguments[flagindex], Arguments[flagindex+1], flagd, flagf);
     }
-    for (int i=0; i<NumFound; i++) {
-        printf("%s\n", FilesBuffer[i]);
+    if (NumFound == 0) {
+        printf("No File Found!\n");
+        return;
+    }
+    if (NumFound < 0) {
+        return;
+    }
+    if (!flage || NumFound > 1) {
+        for (int i=0; i<NumFound; i++) {
+            char Relative[BUFFERLENGTH];
+            strcpy(Relative, "./");
+            if (Arguments[flagindex+1] != NULL)
+                strcat(Relative, &FilesBuffer[i][strlen(Arguments[flagindex+1])+1]);
+            else
+                strcat(Relative, &FilesBuffer[i][2]);
+            printf("%s\n", Relative);
+        }
+    }
+    else {
+        if (IsDirectory(FilesBuffer[0])) {
+            printf("Warping to %s\n", FilesBuffer[0]);
+            WarpSeperate(FilesBuffer[0]);
+        }
+        else {
+            FILE* fptr = fopen(FilesBuffer[0],"r");
+            char str[50];
+            while (fgets(str, 50, fptr) != NULL) {
+                printf("%s", str);
+            }
+            printf("\n");
+        }
     }
 }

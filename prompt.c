@@ -1,6 +1,8 @@
 #include "headers.h"
 
 char ShellStartLocation[BUFFERLENGTH];
+int ForegroundProcTime;
+char ForegroundProcMax[BUFFERLENGTH];
 
 void SetShellStartLocation()
 {
@@ -8,6 +10,21 @@ void SetShellStartLocation()
     {
         fprintf(stderr, "Current Location Invalid!\n");
         exit(EXIT_FAILURE);
+    }
+}
+
+void AddForegroundProc(const char* ForegroundProc, int ExecTime) {
+    if (ExecTime > ForegroundProcTime) {
+        strcpy(ForegroundProcMax, ForegroundProc);
+        ForegroundProcTime = ExecTime;
+    }
+}
+
+void GetForegroundProc(char* Foreground, int BufferLength) {
+    if (ForegroundProcTime == 0)
+        Foreground[0] = '\0';
+    else {
+        snprintf(Foreground, BufferLength, " %s : %ds", ForegroundProcMax, ForegroundProcTime);
     }
 }
 
@@ -77,5 +94,9 @@ void prompt()
     char CurrentDir[BUFFERLENGTH];
     GetCurrentLocation(CurrentDir, BUFFERLENGTH);
 
-    printf("<%s@%s:%s> ", User, SYSname, CurrentDir);
+    char Foreground[BUFFERLENGTH];
+    GetForegroundProc(Foreground, BUFFERLENGTH);
+    ForegroundProcTime = 0;
+
+    printf("<%s@%s:%s%s> ", User, SYSname, CurrentDir, Foreground);
 }

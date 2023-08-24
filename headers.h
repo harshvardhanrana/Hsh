@@ -16,6 +16,7 @@
 #include <assert.h>
 #include <sys/types.h>
 #include <signal.h>
+#include <time.h>
 
 #include "prompt.h"
 #include "command.h"
@@ -26,6 +27,7 @@
 #include "utils.h"
 #include "proclore.h"
 #include "seek.h"
+#include "errorhandle.h"
 
 #define BUFFERLENGTH 256
 
