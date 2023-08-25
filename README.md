@@ -18,6 +18,8 @@ Also in seek, I am assuming that '.' and '..' will not be the first argument.
 
 In proclore, I am assuming that the state will have '+' if its pid matches with the terminal.
 
+If your previous command was echo 5 and you executed pastevents execute 1; then it would be saved as echo 5; and therefore it would be a new command. If it is just pastevents 1 it wont be saved as it will be echo 5 which is the same as previous command.
+
 Length of maximum command name is assumed to be 256 characters.
 Length of absolute path of a file is also assumed to be 256 characters.
 Maximum characters in a line is assumed to be 4096 characters.
