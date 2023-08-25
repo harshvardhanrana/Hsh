@@ -43,6 +43,18 @@ void PrintStatistic(char* directory, char* file) {
     printf("%s\n",file);
 }
 
+int GetBlockSize(char* directory, char* file) {
+    char file_location[BUFFERLENGTH];
+    strcpy(file_location, directory);
+    strcat(file_location, "/");
+    strcat(file_location, file);
+    struct stat fileinfo;
+    if (stat(file_location, &fileinfo) == -1) {
+        return 0;
+    }
+    return fileinfo.st_blocks;
+}
+
 void PeekHandle(char *Location, int flaga, int flagl)
 {
 
@@ -80,6 +92,16 @@ void PeekHandle(char *Location, int flaga, int flagl)
         printf("Unable to access scandir\n");
         return;
     }
+    if (flagl) {
+        int sum = 0;
+        while (index < numfiles) {
+            en = files[index];
+            sum += GetBlockSize(temp, en->d_name);
+            index++;
+        }
+        printf("total %d\n", sum);
+    }
+    index = 0;
     while (index < numfiles) {
         en = files[index];
         if (flaga || (*en->d_name != '.'))
