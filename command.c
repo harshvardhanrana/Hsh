@@ -9,7 +9,7 @@ void ExecuteForegroundCommand(char **Arguments)
         int res = execvp(Arguments[0], Arguments);
         if (res == -1)
         {
-            printf("ERROR: '%s' is not a valid command\n", Arguments[0]);
+            PrintError("'%s' is not a valid command\n", Arguments[0]);
         }
     }
     else
