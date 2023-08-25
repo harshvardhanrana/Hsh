@@ -14,15 +14,8 @@ void ExecuteForegroundCommand(char **Arguments)
     }
     else
     {
-        time_t start,end;
-        start = time(NULL);
         int y;
         waitpid(ex, &y, 0);
-        end = time(NULL);
-        int execution_time = ((int)(end - start));
-        if (execution_time >= 2) {
-            AddForegroundProc(Arguments[0], execution_time);
-        }
     }
 }
 
@@ -71,6 +64,9 @@ void ProcessInput(char *Input, int Flag, char* OriginalInput)
         return;
     }
 
+    time_t start,end;
+    start = time(NULL);
+
     if (strcmp(argv[0],"warp") == 0)
         warp(argv);
     else if (strcmp(argv[0],"peek") == 0)
@@ -89,6 +85,11 @@ void ProcessInput(char *Input, int Flag, char* OriginalInput)
         ExecuteForegroundCommand(argv);
     else
         ExecuteBackgroundCommand(argv);
+
+    end = time(NULL);
+    if (!Flag && (end - start) >= 2) {
+        AddForegroundProc(argv[0], (end - start));
+    }
 }
 
 void SplitStrings(char *InputString, const int InputLength, int IsCalled)
