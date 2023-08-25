@@ -1,4 +1,4 @@
-#include "headers.h"
+#include "../headers/headers.h"
 
 extern char ShellStartLocation[BUFFERLENGTH];
 
@@ -61,9 +61,9 @@ void PastExecute(char *IndexStr, char* BigString, char* ToReplace)
     }
     int RealIndex = NumElems - Index;
     char temp[4096];
-    strcpy(temp ,Pastevents[RealIndex%15]);
+    strcpy(temp ,Pastevents[(Start+RealIndex)%15]);
     SplitStrings(temp, 4096, 1);
-    StringReplace(BigString, ToReplace, Pastevents[RealIndex%15]);
+    StringReplace(BigString, ToReplace, Pastevents[(Start+RealIndex)%15]);
 }
 
 
@@ -75,8 +75,13 @@ void ProcessPast(char **Arguments, char* OriginalString, char* TokenString)
         NumElems = 0;
         WriteIntoFile();
     }
-    else if (strcmp(Arguments[1], "execute") == 0)
+    else if (strcmp(Arguments[1], "execute") == 0) {
+        if (Arguments[2] == NULL) {
+            PrintError("No argument found after execute!\n");
+            return;
+        }
         PastExecute(Arguments[2], OriginalString, TokenString);
+    }
     else {
         PrintError("Invalid Argument: %s\n", Arguments[1]);
     }

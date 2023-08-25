@@ -15,7 +15,6 @@
 #include <time.h>
 #include <assert.h>
 #include <sys/types.h>
-#include <signal.h>
 #include <time.h>
 #include <stdarg.h>
 

@@ -1,4 +1,4 @@
-#include "headers.h"
+#include "../headers/headers.h"
 
 void GetProcLocation(int procid, char Buffer[], int BufferLength) {
     char path_buf[BUFFERLENGTH];
@@ -9,7 +9,6 @@ void GetProcLocation(int procid, char Buffer[], int BufferLength) {
         return;
     }
     Buffer[byteswritten] = '\0';
-    printf("%s\n",Buffer);
     MakeRelative(Buffer, BufferLength);
 }
 
@@ -31,7 +30,7 @@ void Proclore(char* Argument) {
 
     FILE* fptr = fopen(stat_path, "r");
     if (fptr == NULL) {
-        printf("Invalid Process ID: %d\n", procid);
+        PrintError("Invalid Process ID: %d\n", procid);
         return;
     }
 
@@ -51,7 +50,6 @@ void Proclore(char* Argument) {
         printf("+");
     }
     printf("\n");
-    printf("%d\n", getpgrp());
     printf("Process Group : %d\n", grpid);
     printf("Virtual memory : %lu\n", virtualmemory);
 

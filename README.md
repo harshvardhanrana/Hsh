@@ -1,4 +1,19 @@
 # Description
 
+Hsh is a lightweight and versatile shell written in C. It is easy to edit and use.
+
+# Instruction
+
+1) Clone the repository
+2) run Make command
+3) Your executible is ready to go. Use it by typing ./hsh
+
 # Assumptions
-Need to Implement Background processes errors handle
+
+In seek function, if you try to seek for a file x, you would get the paths for x and any
+file that starts with x. --> x(dot)
+For example if you seek for file_name, you would get results as file_name, file_name.txt but not
+file_name2.txt
+
+In proclore, I am assuming that the state will have '+' if its pid matches with the terminal.
+

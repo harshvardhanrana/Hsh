@@ -1,4 +1,4 @@
-#include "headers.h"
+#include "../headers/headers.h"
 
 void StringReplace(char* BigString, char* ToReplace, char* ReplaceWith) {
     int index = 0;

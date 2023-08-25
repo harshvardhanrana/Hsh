@@ -1,4 +1,4 @@
-#include "headers.h"
+#include "../headers/headers.h"
 
 char PrevDirectory[BUFFERLENGTH] = {'\0'};
 int Used = 0;
@@ -15,7 +15,7 @@ int WarpSeperate(const char* Location) {
         if (Used)
             status = chdir(PrevDirectory);
         else {
-            printf("OLDPWD Not Set!\n");
+            PrintError("OLDPWD Not Set!\n");
         }
     }
     else if (strcmp(Location, "~") == 0) {
@@ -45,9 +45,20 @@ void warp(char** Arguments) {
 
     while (Arguments[index] != NULL && status == 1) {
         if ((Arguments[index][0] == '~' || Arguments[index][0] == '-') && Arguments[index][1] == '/') {
-            Arguments[index][1] = '\0';
-            status &= WarpSeperate(Arguments[index]);
-            status &= WarpSeperate(&Arguments[index][2]);
+            char temp[BUFFERLENGTH];
+            if (Arguments[index][0] == '~') {
+                strcpy(temp, ShellStartLocation);
+            }
+            else {
+                if (!Used) {
+                    PrintError("OLDPWD Not Set!\n");
+                    status = 0;
+                }
+                strcpy(temp, PrevDirectory);
+            }
+            strcat(temp, "/");
+            strcat(temp, &Arguments[index][2]);
+            status = status && WarpSeperate(temp);
         }
         else {
             status &= WarpSeperate(Arguments[index]);

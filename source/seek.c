@@ -1,4 +1,4 @@
-#include "headers.h"
+#include "../headers/headers.h"
 
 char FirstFile[1024] = {'\0'};
 char *LocationToSearch;
@@ -138,7 +138,7 @@ void seek(char **Arguments)
             }
             else
             {
-                printf("Invalid Flag Found!\n");
+                PrintError("Invalid Flag Found: %c\n", Arguments[flagindex][i]);
                 return;
             }
         }
@@ -151,7 +151,7 @@ void seek(char **Arguments)
     }
     if (flagf == 1 && flagd == 1)
     {
-        PrintError("-f and -d flags can't be used together\n");
+        PrintError("Invalid flags!\n");
         return;
     }
     if (flagf == 0 && flagd == 0)
@@ -182,7 +182,7 @@ void seek(char **Arguments)
     }
     if (NumFound == 0)
     {
-        printf("No File Found!\n");
+        printf("No match found!\n");
         return;
     }
     if (NumFound < 0)
@@ -203,6 +203,7 @@ void seek(char **Arguments)
         }
         else
         {
+            PrintRelative(FirstFile, 0);
             FILE *fptr = fopen(FirstFile, "r");
             if (fptr == NULL)
             {
@@ -214,7 +215,6 @@ void seek(char **Arguments)
             {
                 printf("%s", str);
             }
-            printf("\n");
         }
     }
 }

@@ -1,4 +1,4 @@
-#include "headers.h"
+#include "../headers/headers.h"
 
 extern char PrevDirectory[BUFFERLENGTH];
 extern int Used;

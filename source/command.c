@@ -1,5 +1,14 @@
-#include "headers.h"
+#include "../headers/headers.h"
 
+int IsEmptyString(char* Statement) {
+    int index = 0;
+    while (Statement[index] != '\0') {
+        if (Statement[index] != ' ' && Statement[index] != '\t' && Statement[index] != ';' && Statement[index] != '&')
+            return 0;
+        index++;
+    }
+    return 1;
+}
 
 void ExecuteForegroundCommand(char **Arguments)
 {
@@ -117,7 +126,7 @@ void SplitStrings(char *InputString, const int InputLength, int IsCalled)
         }
     }
     ProcessInput(&InputString[StringStart], 0, temp);
-    if (!IsPastEvent && !CheckPastEvent(temp) && !IsCalled && !PastEventError)
+    if (!IsEmptyString(temp) && !IsPastEvent && !CheckPastEvent(temp) && !IsCalled && !PastEventError)
         AddHistory(temp);
 
 }

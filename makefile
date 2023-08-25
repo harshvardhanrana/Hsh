@@ -1,2 +1,2 @@
 main:
-	gcc -fsanitize=address -g *.c
+	gcc source/*.c -o hsh
