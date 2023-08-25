@@ -17,6 +17,7 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <time.h>
+#include <stdarg.h>
 
 #include "prompt.h"
 #include "command.h"

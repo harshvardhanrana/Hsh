@@ -5,27 +5,29 @@ extern int Used;
 
 extern char ShellStartLocation[BUFFERLENGTH];
 
-void PrintPermission(struct stat fileinfo) {
-    printf( (S_ISDIR(fileinfo.st_mode)) ? "d" : "-");
-    printf( (fileinfo.st_mode & S_IRUSR) ? "r" : "-");
-    printf( (fileinfo.st_mode & S_IWUSR) ? "w" : "-");
-    printf( (fileinfo.st_mode & S_IXUSR) ? "x" : "-");
-    printf( (fileinfo.st_mode & S_IRGRP) ? "r" : "-");
-    printf( (fileinfo.st_mode & S_IWGRP) ? "w" : "-");
-    printf( (fileinfo.st_mode & S_IXGRP) ? "x" : "-");
-    printf( (fileinfo.st_mode & S_IROTH) ? "r" : "-");
-    printf( (fileinfo.st_mode & S_IWOTH) ? "w" : "-");
-    printf( (fileinfo.st_mode & S_IXOTH) ? "x " : "- ");
-
+void PrintPermission(struct stat fileinfo)
+{
+    printf((S_ISDIR(fileinfo.st_mode)) ? "d" : S_ISLNK(fileinfo.st_mode) ? "l" : "-");
+    printf((fileinfo.st_mode & S_IRUSR) ? "r" : "-");
+    printf((fileinfo.st_mode & S_IWUSR) ? "w" : "-");
+    printf((fileinfo.st_mode & S_IXUSR) ? "x" : "-");
+    printf((fileinfo.st_mode & S_IRGRP) ? "r" : "-");
+    printf((fileinfo.st_mode & S_IWGRP) ? "w" : "-");
+    printf((fileinfo.st_mode & S_IXGRP) ? "x" : "-");
+    printf((fileinfo.st_mode & S_IROTH) ? "r" : "-");
+    printf((fileinfo.st_mode & S_IWOTH) ? "w" : "-");
+    printf((fileinfo.st_mode & S_IXOTH) ? "x " : "- ");
 }
 
-void PrintStatistic(char* directory, char* file) {
+void PrintStatistic(char *directory, char *file)
+{
     char file_location[BUFFERLENGTH];
     strcpy(file_location, directory);
     strcat(file_location, "/");
     strcat(file_location, file);
     struct stat fileinfo;
-    if (stat(file_location, &fileinfo) == -1) {
+    if (lstat(file_location, &fileinfo) == -1)
+    {
         printf("Unable to Call Stat for %s!\n", file_location);
         return;
     }
@@ -35,24 +37,47 @@ void PrintStatistic(char* directory, char* file) {
     printf("%15s ", getgrgid(fileinfo.st_gid)->gr_name);
     printf("%13ld ", fileinfo.st_size);
     char date[64];
-    if (time(0) - fileinfo.st_mtime >= 6*31*24*60*60)
+    if (time(0) - fileinfo.st_mtime >= 6 * 31 * 24 * 60 * 60)
         strftime(date, 64, "%b %d  %Y", localtime(&(fileinfo.st_mtime)));
     else
         strftime(date, 64, "%b %d %H:%M", localtime(&(fileinfo.st_mtime)));
-    printf("%s ",date);
-    printf("%s\n",file);
+    printf("%s ", date);
+    printf("%s\n", file);
 }
 
-int GetBlockSize(char* directory, char* file) {
+int GetBlockSize(char *directory, char *file)
+{
     char file_location[BUFFERLENGTH];
     strcpy(file_location, directory);
     strcat(file_location, "/");
     strcat(file_location, file);
     struct stat fileinfo;
-    if (stat(file_location, &fileinfo) == -1) {
-        return 0;
+    if (lstat(file_location, &fileinfo) == -1)
+    {
+        PrintError("Unable to access stat for %s\n", file_location);
+        return -1;
     }
     return fileinfo.st_blocks;
+}
+
+void ChangeColor(char *directory, char *file)
+{
+    char file_location[BUFFERLENGTH];
+    strcpy(file_location, directory);
+    strcat(file_location, "/");
+    strcat(file_location, file);
+    struct stat fileinfo;
+    if (lstat(file_location, &fileinfo) == -1)
+    {
+        PrintError("Unable to access %s", file_location);
+        return;
+    }
+    if (S_ISDIR(fileinfo.st_mode))
+        printf("\033[1;34m");
+    else if (S_IXUSR & fileinfo.st_mode)
+        printf("\033[1;32m");
+    else
+        printf("\033[1;37m");
 }
 
 void PeekHandle(char *Location, int flaga, int flagl)
@@ -69,7 +94,7 @@ void PeekHandle(char *Location, int flaga, int flagl)
     {
         if (!Used)
         {
-            printf("OLDPWD Not Set!\n");
+            PrintError("OLDPWD Not Set!\n");
             return;
         }
         else
@@ -88,29 +113,47 @@ void PeekHandle(char *Location, int flaga, int flagl)
     struct dirent **files;
     int numfiles = scandir(temp, &files, NULL, alphasort);
     int index = 0;
-    if (numfiles < 0) {
-        printf("Unable to access scandir\n");
+    if (numfiles < 0)
+    {
+        PrintError("Unable to access scandir for %s\n",temp);
         return;
     }
-    if (flagl) {
+    if (flagl)
+    {
         int sum = 0;
-        while (index < numfiles) {
+        while (index < numfiles)
+        {
             en = files[index];
-            sum += GetBlockSize(temp, en->d_name);
+            if (flaga || (*en->d_name != '.'))
+            {
+                int blk = GetBlockSize(temp, en->d_name);
+                if (blk < 0)
+                {
+                    return;
+                }
+                sum += blk;
+            }
             index++;
         }
         printf("total %d\n", sum);
     }
     index = 0;
-    while (index < numfiles) {
+    while (index < numfiles)
+    {
         en = files[index];
         if (flaga || (*en->d_name != '.'))
+        {
+            ChangeColor(temp, en->d_name);
             if (!flagl)
                 printf("%s\n", en->d_name);
             else
                 PrintStatistic(temp, en->d_name);
+            printf("\033[0m");
+        }
+        free(files[index]);
         index++;
     }
+    free(files);
 }
 
 void ProcessPeek(char **Arguments)
@@ -118,8 +161,7 @@ void ProcessPeek(char **Arguments)
     int flagindex = 1;
     int flaga = 0;
     int flagl = 0;
-    while (Arguments[flagindex] != NULL
-     && (Arguments[flagindex][0] == '-' && (Arguments[flagindex][1] == 'a' || Arguments[flagindex][1] == 'l')))
+    while (Arguments[flagindex] != NULL && (Arguments[flagindex][0] == '-' && (Arguments[flagindex][1] != '/' && Arguments[flagindex][1] != '\0')))
     {
         for (int i = 1; Arguments[1][i] != '\0'; i++)
         {
@@ -133,7 +175,7 @@ void ProcessPeek(char **Arguments)
             }
             else
             {
-                printf("Invalid Flag Found!\n");
+                PrintError("Invalid Flag: %c\n", Arguments[flagindex][i]);
                 return;
             }
         }

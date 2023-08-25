@@ -1,5 +1,7 @@
 #include "headers.h"
 
+int BackgroundProcCount = 0;
+
 struct BackgroundProc
 {
     char CommandName[1024];
@@ -22,27 +24,51 @@ void AddBackgroundProcess(char *CommandName, int Pid)
     Last->Pid = Pid;
     strcpy(Last->CommandName, CommandName);
     Last->next = NULL;
+    BackgroundProcCount++;
+}
+
+void RemoveProc(struct BackgroundProc* Childprev) {
+    struct BackgroundProc* temp = Childprev->next;
+    if (Last == temp)
+        Last = Childprev;
+    Childprev->next = temp->next;
+    free(temp);
+    BackgroundProcCount--;
+}
+
+struct BackgroundProc* GetProc(int pid) {
+    struct BackgroundProc* trav = First;
+    while (trav->next != NULL) {
+        if (trav->next->Pid == pid) {
+            return trav;
+        }
+        trav = trav->next;
+    }
+    return NULL;
 }
 
 void RemoveBackgroundBuffers() {
     if (First == NULL)
         return;
     struct BackgroundProc* trav = First;
-    while (trav->next != NULL) {
-        struct BackgroundProc* temp = trav->next;
-        int status;
-        char path_buf[BUFFERLENGTH];
-        char Buffer[BUFFERLENGTH];
-        int path_len = snprintf(path_buf, sizeof path_buf, "/proc/%d/exe", trav->next->Pid);
-        int byteswritten = readlink(path_buf, Buffer, BUFFERLENGTH);
-        if (byteswritten == -1) {
-            printf("%s exited normally (%d)\n", trav->next->CommandName, trav->next->Pid);
-            trav->next = trav->next->next;
-            free(temp);
+    int pid;
+    int status;
+    while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0) {
+        struct BackgroundProc* ChildPrev = GetProc(pid);
+        if (ChildPrev == NULL) {
+            PrintError("Background Process not found with %d\n", pid);
+            return;
         }
+        if(WIFEXITED(status)){
+        	printf("%s exited normally (%d)\n", ChildPrev->next->CommandName, ChildPrev->next->Pid);
+            RemoveProc(ChildPrev);
+        }
+        else if (WIFSTOPPED(status)) {
+            printf("%s suspended normally (%d)\n", ChildPrev->next->CommandName, ChildPrev->next->Pid);
+        } 
         else {
-            trav = trav->next;
+            PrintError("%s did not exit normally (%d)\n", ChildPrev->next->CommandName, ChildPrev->next->Pid);
+            RemoveProc(ChildPrev);
         }
     }
-    Last = trav;
 }

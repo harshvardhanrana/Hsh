@@ -1,2 +1,2 @@
 main:
-	gcc -g *.c
+	gcc -fsanitize=address -g *.c

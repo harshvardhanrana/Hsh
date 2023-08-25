@@ -19,6 +19,7 @@ void ExecuteForegroundCommand(char **Arguments)
     }
 }
 
+extern int BackgroundProcCount;
 
 void ExecuteBackgroundCommand(char **Arguments) {
     int ex = fork();
@@ -32,7 +33,7 @@ void ExecuteBackgroundCommand(char **Arguments) {
     }
     else {
         AddBackgroundProcess(Arguments[0], ex);
-        printf("%d\n", ex);
+        printf("[%d] %d\n", BackgroundProcCount, ex);
     }
 }
 
@@ -75,6 +76,8 @@ void ProcessInput(char *Input, int Flag, char* OriginalInput)
         Proclore(argv[1]);
     else if (strcmp(argv[0], "seek") == 0)
         seek(argv);
+    else if (strcmp(argv[0], "exit") == 0)
+        exit(0);
     else if (strcmp(argv[0], "pastevents") == 0) {
         if (argv[1] == NULL || strcmp(argv[1],"execute")) {
             IsPastEvent = 1;
@@ -89,6 +92,9 @@ void ProcessInput(char *Input, int Flag, char* OriginalInput)
     end = time(NULL);
     if (!Flag && (end - start) >= 2) {
         AddForegroundProc(argv[0], (end - start));
+    }
+    for (int i=0; i<index; i++) {
+        free(argv[i]);
     }
 }
 

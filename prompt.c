@@ -98,5 +98,5 @@ void prompt()
     GetForegroundProc(Foreground, BUFFERLENGTH);
     ForegroundProcTime = 0;
 
-    printf("<%s@%s:%s%s> ", User, SYSname, CurrentDir, Foreground);
+    printf("<\033[1;35m%s\033[1;0m@%s:%s%s> ", User, SYSname, CurrentDir, Foreground);
 }
