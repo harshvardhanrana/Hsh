@@ -49,5 +49,11 @@ extern int CHILDPID;
 void interruptfg(int dummy) 
 {
     if (CHILDPID != 0)
-        kill(CHILDPID, SIGKILL);
+        kill(CHILDPID, SIGINT);
+}
+
+void SaveandExit(int dummy)
+{
+    KillAllProcs();
+    exit(0);
 }

@@ -141,30 +141,7 @@ void LoadCommand(char *Input, int Flag, char* OriginalInput) {
         }
     }
     else {
-        CHILDPID = fork();
-        if (CHILDPID == 0) {
-            ProcessPipe(Input, 0, OriginalInput);
-            exit(0);
-        }
-        else {
-            time_t start,end;
-            start = time(NULL);
-            int y;
-            waitpid(CHILDPID, &y, WUNTRACED);
-            end = time(NULL);
-            if (end - start >= 2) {
-                char CommandName[128];
-                int i = 0;
-                while (Input[i] != '\0' && Input[i] != '|' && Input[i] != ' ' && Input[i] != '\t' &&
-                Input[i] != '<' && Input[i] != '>') {
-                    CommandName[i] = Input[i];
-                    i++;
-                }
-                CommandName[i] = '\0';
-                AddForegroundProc(CommandName, end-start);
-            }
-        }
-        CHILDPID = 0;
+        ProcessPipe(Input, 0, OriginalInput);
     }
 }
 
@@ -176,6 +153,8 @@ void SplitStrings(char *InputString, const int InputLength, int IsCalled)
     int StringStart = 0;
     IsPastEvent = 0;
     PastEventError = 0;
+    if (!IsEmptyString(temp) && !CheckPastEvent(temp) && PastStringStatus == 0)
+        AddHistory(temp);
 
     for (int index = 0; InputString[index] != '\0'; index++)
     {
@@ -189,7 +168,6 @@ void SplitStrings(char *InputString, const int InputLength, int IsCalled)
     }
     LoadCommand(&InputString[StringStart], 0, temp);
     // if (!IsEmptyString(temp) && !IsPastEvent && !CheckPastEvent(temp) && !IsCalled && !PastEventError)
-    if (!IsEmptyString(temp) && !CheckPastEvent(temp) && PastStringStatus == 0)
-        AddHistory(temp);
+    
 
 }

@@ -3,6 +3,7 @@
 
 void AddBackgroundProcess(char* CommandName, int Pid);
 void RemoveProcWithPid(int pid);
+void KillAllProcs();
 
 void RemoveBackgroundBuffers();
 int Activities();

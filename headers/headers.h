@@ -20,6 +20,8 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/wait.h>
+#include <termios.h>
+#include <ctype.h>
 
 #include "prompt.h"
 #include "command.h"

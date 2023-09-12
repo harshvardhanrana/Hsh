@@ -52,6 +52,16 @@ void RemoveProcWithPid(int pid) {
     RemoveProc(prev);
 }
 
+void KillAllProcs() {
+    if (First == NULL)
+        return;
+    struct BackgroundProc* trav = First;
+    while (trav->next != NULL) {
+        trav = trav->next;
+        kill(trav->Pid, SIGKILL);
+    }
+}
+
 void RemoveBackgroundBuffers() {
     if (First == NULL)
         return;
