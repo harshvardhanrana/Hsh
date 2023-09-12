@@ -31,8 +31,10 @@ void RemoveProc(struct BackgroundProc* Childprev) {
     struct BackgroundProc* temp = Childprev->next;
     if (Last == temp)
         Last = Childprev;
-    Childprev->next = temp->next;
-    free(temp);
+    if (temp != NULL) {
+        Childprev->next = temp->next;
+        free(temp);
+    }
     BackgroundProcCount--;
 }
 
@@ -49,7 +51,8 @@ struct BackgroundProc* GetProc(int pid) {
 
 void RemoveProcWithPid(int pid) {
     struct BackgroundProc* prev = GetProc(pid);
-    RemoveProc(prev);
+    if (prev != NULL)
+        RemoveProc(prev);
 }
 
 void KillAllProcs() {
@@ -89,7 +92,7 @@ void RemoveBackgroundBuffers() {
 }
 
 int Activities() {
-    if (First == NULL) {
+    if (First == NULL || First->next == NULL) {
         printf("No process found!\n");
         return 0;
     }
@@ -100,4 +103,5 @@ int Activities() {
         waitpid(trav->Pid, &status, WNOHANG | WUNTRACED);
         printf("%d : %s - %s\n", trav->Pid, trav->CommandName, WIFSTOPPED(status) ? "Stopped" : "Running");
     }
+    return 0;
 }

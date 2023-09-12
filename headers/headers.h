@@ -22,6 +22,8 @@
 #include <sys/wait.h>
 #include <termios.h>
 #include <ctype.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 
 #include "prompt.h"
 #include "command.h"
@@ -36,6 +38,9 @@
 #include "redirection.h"
 #include "piping.h"
 #include "signals.h"
+#include "main.h"
+#include "neonate.h"
+#include "iman.h"
 
 #define BUFFERLENGTH 256
 

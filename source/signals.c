@@ -57,3 +57,10 @@ void SaveandExit(int dummy)
     KillAllProcs();
     exit(0);
 }
+
+extern char CURCOMMAND[256];
+
+void sendtobg(int dummy) {
+    kill(getpid(), 18);
+    AddBackgroundProcess(CURCOMMAND, CHILDPID);
+}

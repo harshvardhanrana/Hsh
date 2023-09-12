@@ -2,6 +2,7 @@
 
 int ExitFlag;
 int CHILDPID = 0;
+char CURCOMMAND[256];
 
 int IsEmptyString(char* Statement) {
     int index = 0;
@@ -15,9 +16,10 @@ int IsEmptyString(char* Statement) {
 
 void ExecuteForegroundCommand(char **Arguments)
 {
-    int ex = fork();
-    if (ex == 0)
+    CHILDPID = fork();
+    if (CHILDPID == 0)
     {
+        signal(SIGTSTP, SIG_DFL);
         int res = execvp(Arguments[0], Arguments);
         if (res == -1)
         {
@@ -28,8 +30,10 @@ void ExecuteForegroundCommand(char **Arguments)
     else
     {
         int y;
-        waitpid(ex, &y, 0);
+        strcpy(CURCOMMAND, Arguments[0]);
+        waitpid(CHILDPID, &y, WUNTRACED);
     }
+    CHILDPID = 0;
 }
 
 extern int BackgroundProcCount;
@@ -98,6 +102,10 @@ void ProcessInput(char *Input, int Flag, char* OriginalInput)
         bg(argv[1]);
     else if (strcmp(argv[0], "fg") == 0)
         fg(argv[1]);
+    else if (strcmp(argv[0], "neonate") == 0)
+        neonate(argv);
+    else if (strcmp(argv[0], "iMan") == 0)
+        iman(argv[1]);
     else if (strcmp(argv[0], "exit") == 0)
         ExitFlag = 1;
     else if (strcmp(argv[0], "pastevents") == 0) {
