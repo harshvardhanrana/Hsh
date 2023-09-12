@@ -20,3 +20,12 @@ void StringReplace(char* BigString, char* ToReplace, char* ReplaceWith) {
         index++;
     }
 }
+
+int StringtoInt(char* NumString) {
+    int num = 0;
+    for (int i=0; NumString[i] <= '9' && NumString[i] >= '0'; i++) {
+        num *= 10;
+        num += (int)NumString[i] - '0';
+    }
+    return num;
+}

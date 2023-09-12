@@ -107,3 +107,74 @@ int CheckPastEvent(const char* InputString) {
         return strcmp(Pastevents[(Start + NumElems - 1) % 15], InputString) == 0;
     }
 }
+
+int PastEventsStringReplace(char* InputString, int BufferSize) {
+    const int pasteventsize = 10;
+    const int executesize = 7;
+    int flag = 1;
+    int tosave = 0;
+    int execute = 0;
+    int StringStart = 0;
+    int StringEnd = 0;
+    for (int i=0; i+pasteventsize<BufferSize && InputString[i] != '\0'; i++) {
+        if (InputString[i] == ' ' || InputString[i] == '\t' || InputString[i] == '\n')
+            continue;
+        if (flag) {
+            StringStart = i;
+            char temp = InputString[i+pasteventsize];
+            InputString[i+pasteventsize] = '\0';
+            flag = strcmp(&InputString[i], "pastevents");
+            InputString[i+pasteventsize] = temp;
+            if (!flag) {
+                i += pasteventsize;
+            }
+        }
+        else if (!execute) {
+            tosave = 1;
+            char temp = InputString[i+executesize];
+            InputString[i+executesize] = '\0';
+            flag = strcmp(&InputString[i], "execute");
+            InputString[i+executesize] = temp;
+            if (!flag) {
+                execute = 1;
+                i += executesize;
+            }
+        }
+        else {
+            tosave = 0;
+            int j = i;
+            int index = 0;
+            while (InputString[j] != '\0' && InputString[j] != '|' && InputString[j] != ';' &&
+             InputString[j] != '&' && InputString[j] != '<' && InputString[j] != '>'
+              && InputString[j] != ' ' && InputString[j] != '\t') {
+                index *= 10;
+                if (InputString[j] >= '0' && InputString[j] <= '9') {
+                    index += (int)InputString[j] - '0';
+                }
+                else {
+                    PrintError("Invalid Character in Index!\n");
+                    return -1;
+                }
+                j++;
+            }
+            StringEnd = j;
+            if (index > NumElems || index <= 0) {
+                PrintError("Invalid Index: %d\n", index);
+                PastEventError = 1;
+                return -1;
+            }
+            char Newstring[4096];
+            InputString[StringStart] = '\0';
+            strcpy(Newstring, InputString);
+            strcat(Newstring, Pastevents[(Start+NumElems - index)%15]);
+            i = strlen(Newstring)-1;
+            execute = 0;
+            flag = 1;
+            strcat(Newstring, &InputString[StringEnd]);
+            strcpy(InputString, Newstring);
+        }
+    }
+    if (!flag)
+        tosave = 1;
+    return tosave;
+}

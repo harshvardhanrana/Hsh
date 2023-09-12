@@ -4,6 +4,7 @@ extern int ExitFlag;
 
 int main()
 {
+    signal(SIGINT, interruptfg);
     SetShellStartLocation();
     ReadFromFile();
     // Keep accepting commands

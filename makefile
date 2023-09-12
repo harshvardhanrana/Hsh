@@ -1,2 +1,2 @@
 main:
-	gcc source/*.c -o hsh
+	gcc -g source/*.c -o hsh

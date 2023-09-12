@@ -1,6 +1,7 @@
 #include "../headers/headers.h"
 
 int ExitFlag;
+int CHILDPID = 0;
 
 int IsEmptyString(char* Statement) {
     int index = 0;
@@ -21,8 +22,9 @@ void ExecuteForegroundCommand(char **Arguments)
         if (res == -1)
         {
             PrintError("'%s' is not a valid command\n", Arguments[0]);
+            exit(0);
         }
-    }
+    }   
     else
     {
         int y;
@@ -40,6 +42,7 @@ void ExecuteBackgroundCommand(char **Arguments) {
         if (res == -1)
         {
             printf("ERROR: '%s' is not a valid command\n", Arguments[0]);
+            exit(0);    
         }
     }
     else {
@@ -87,6 +90,14 @@ void ProcessInput(char *Input, int Flag, char* OriginalInput)
         Proclore(argv[1]);
     else if (strcmp(argv[0], "seek") == 0)
         seek(argv);
+    else if (strcmp(argv[0], "activities") == 0)
+        Activities();
+    else if (strcmp(argv[0], "ping") == 0)
+        Ping(argv);
+    else if (strcmp(argv[0], "bg") == 0)
+        bg(argv[1]);
+    else if (strcmp(argv[0], "fg") == 0)
+        fg(argv[1]);
     else if (strcmp(argv[0], "exit") == 0)
         ExitFlag = 1;
     else if (strcmp(argv[0], "pastevents") == 0) {
@@ -109,9 +120,58 @@ void ProcessInput(char *Input, int Flag, char* OriginalInput)
     }
 }
 
+void LoadCommand(char *Input, int Flag, char* OriginalInput) {
+    if (Flag == 1) {
+        int pid = fork();
+        if (pid == 0) {
+            ProcessPipe(Input, 0, OriginalInput);
+            exit(0);
+        }
+        else {
+            char CommandName[128];
+            int i = 0;
+            while (Input[i] != '\0' && Input[i] != '|' && Input[i] != ' ' && Input[i] != '\t' &&
+            Input[i] != '<' && Input[i] != '>') {
+                CommandName[i] = Input[i];
+                i++;
+            }
+            CommandName[i] = '\0';
+            AddBackgroundProcess(CommandName, pid);
+            printf("[%d] %d\n", BackgroundProcCount, pid);
+        }
+    }
+    else {
+        CHILDPID = fork();
+        if (CHILDPID == 0) {
+            ProcessPipe(Input, 0, OriginalInput);
+            exit(0);
+        }
+        else {
+            time_t start,end;
+            start = time(NULL);
+            int y;
+            waitpid(CHILDPID, &y, WUNTRACED);
+            end = time(NULL);
+            if (end - start >= 2) {
+                char CommandName[128];
+                int i = 0;
+                while (Input[i] != '\0' && Input[i] != '|' && Input[i] != ' ' && Input[i] != '\t' &&
+                Input[i] != '<' && Input[i] != '>') {
+                    CommandName[i] = Input[i];
+                    i++;
+                }
+                CommandName[i] = '\0';
+                AddForegroundProc(CommandName, end-start);
+            }
+        }
+        CHILDPID = 0;
+    }
+}
+
 void SplitStrings(char *InputString, const int InputLength, int IsCalled)
 {
     char temp[4096];
+    int PastStringStatus = PastEventsStringReplace(InputString, BUFFERLENGTH);
     strcpy(temp, InputString);
     int StringStart = 0;
     IsPastEvent = 0;
@@ -123,12 +183,13 @@ void SplitStrings(char *InputString, const int InputLength, int IsCalled)
         {
             int flag = (InputString[index] == '&');
             InputString[index] = '\0';
-            ProcessInput(&InputString[StringStart], flag, temp);
+            LoadCommand(&InputString[StringStart], flag, temp);
             StringStart = index + 1;
         }
     }
-    ProcessInput(&InputString[StringStart], 0, temp);
-    if (!IsEmptyString(temp) && !IsPastEvent && !CheckPastEvent(temp) && !IsCalled && !PastEventError)
+    LoadCommand(&InputString[StringStart], 0, temp);
+    // if (!IsEmptyString(temp) && !IsPastEvent && !CheckPastEvent(temp) && !IsCalled && !PastEventError)
+    if (!IsEmptyString(temp) && !CheckPastEvent(temp) && PastStringStatus == 0)
         AddHistory(temp);
 
 }

@@ -47,6 +47,11 @@ struct BackgroundProc* GetProc(int pid) {
     return NULL;
 }
 
+void RemoveProcWithPid(int pid) {
+    struct BackgroundProc* prev = GetProc(pid);
+    RemoveProc(prev);
+}
+
 void RemoveBackgroundBuffers() {
     if (First == NULL)
         return;
@@ -67,8 +72,22 @@ void RemoveBackgroundBuffers() {
             printf("%s suspended normally (%d)\n", ChildPrev->next->CommandName, ChildPrev->next->Pid);
         } 
         else {
-            PrintError("%s did not exit normally (%d)\n", ChildPrev->next->CommandName, ChildPrev->next->Pid);
+            printf("%s did not exit normally (%d)\n", ChildPrev->next->CommandName, ChildPrev->next->Pid);
             RemoveProc(ChildPrev);
         }
+    }
+}
+
+int Activities() {
+    if (First == NULL) {
+        printf("No process found!\n");
+        return 0;
+    }
+    struct BackgroundProc* trav = First;
+    int status;
+    while (trav->next != NULL) {
+        trav = trav->next;
+        waitpid(trav->Pid, &status, WNOHANG | WUNTRACED);
+        printf("%d : %s - %s\n", trav->Pid, trav->CommandName, WIFSTOPPED(status) ? "Stopped" : "Running");
     }
 }

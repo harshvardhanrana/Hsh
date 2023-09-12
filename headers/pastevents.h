@@ -6,5 +6,6 @@ void AddHistory();
 void RemoveLastPast();
 int CheckPastEvent(const char*);
 void ReadFromFile();
+int PastEventsStringReplace(char* InputString, int BufferSize);
 
 #endif

@@ -17,6 +17,9 @@
 #include <sys/types.h>
 #include <time.h>
 #include <stdarg.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <sys/wait.h>
 
 #include "prompt.h"
 #include "command.h"
@@ -28,6 +31,9 @@
 #include "proclore.h"
 #include "seek.h"
 #include "errorhandle.h"
+#include "redirection.h"
+#include "piping.h"
+#include "signals.h"
 
 #define BUFFERLENGTH 256
 
