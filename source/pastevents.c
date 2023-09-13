@@ -55,7 +55,6 @@ void PastExecute(char *IndexStr, char* BigString, char* ToReplace)
         Index += (int)(IndexStr[i] - '0');
     }
     if (Index > NumElems) {
-        PrintError("Invalid Index: %d\n", Index);
         PastEventError = 1;
         return;
     }
