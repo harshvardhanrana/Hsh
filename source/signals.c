@@ -27,24 +27,27 @@ int bg(char* arg) {
     return 0;
 }
 
+
+extern int CHILDPID;
+extern char CURCOMMAND[256];
+
 int fg(char* arg) {
     if (arg == NULL) {
         PrintError("Expected atleast 1 argument!\n");
         return 1;
     }
-    int pid;
-    if ((pid = StringtoInt(arg)) < 0) {
+    if ((CHILDPID = StringtoInt(arg)) < 0) {
         PrintError("No such process found!\n");
         return 1;
     }
-    kill(pid, 18);
-    RemoveProcWithPid(pid);
+    kill(CHILDPID, SIGCONT);
+    RemoveProcWithPid(CHILDPID, CURCOMMAND);
     int y;
-    waitpid(pid, &y, 0);
+    waitpid(CHILDPID, &y, WUNTRACED);
+    CHILDPID = 0;
     return 0;
 }
 
-extern int CHILDPID;
 
 void interruptfg(int dummy) 
 {
@@ -58,9 +61,25 @@ void SaveandExit(int dummy)
     exit(0);
 }
 
-extern char CURCOMMAND[256];
 
 void sendtobg(int dummy) {
-    kill(getpid(), 18);
-    AddBackgroundProcess(CURCOMMAND, CHILDPID);
+    if (CHILDPID != 0) {
+        kill(CHILDPID, SIGSTOP);
+        AddBackgroundProcess(CURCOMMAND, CHILDPID);
+    }
+    CHILDPID = 0;
+}
+
+int RUN = 0;
+
+void ResumeChild() {
+    if (CHILDPID != 0) {
+        kill(CHILDPID, SIGCONT);
+    }
+}
+
+void PauseChild() {
+    if (CHILDPID != 0) {
+        kill(CHILDPID, SIGSTOP);
+    }
 }

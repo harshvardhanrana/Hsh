@@ -1,13 +1,13 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/76mHqLr5)
 # Description
 
-Hsh is a lightweight and versatile shell written in C. It is easy to edit and use.
+Hash is a lightweight and versatile shell written in C. It is easy to edit and use.
 
 # Instruction
 
 1) Clone the repository
 2) run Make command
-3) Your executible is ready to go. Use it by typing ./hsh
+3) Your executible is ready to go. Use it by typing ./a.out
 
 # Assumptions
 
@@ -24,3 +24,4 @@ If your previous command was echo 5 and you executed pastevents execute 1; then 
 Length of maximum command name is assumed to be 256 characters.
 Length of absolute path of a file is also assumed to be 256 characters.
 Maximum characters in a line is assumed to be 4096 characters.
+

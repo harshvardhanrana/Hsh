@@ -80,7 +80,7 @@ void ChangeColor(char *directory, char *file)
         printf("\033[1;37m");
 }
 
-void PeekHandle(char *Location, int flaga, int flagl)
+int PeekHandle(char *Location, int flaga, int flagl)
 {
 
     char temp[256];
@@ -95,7 +95,7 @@ void PeekHandle(char *Location, int flaga, int flagl)
         if (!Used)
         {
             PrintError("OLDPWD Not Set!\n");
-            return;
+            return -1;
         }
         else
         {
@@ -116,7 +116,7 @@ void PeekHandle(char *Location, int flaga, int flagl)
     if (numfiles < 0)
     {
         PrintError("Unable to access scandir for %s\n",temp);
-        return;
+        return -1;
     }
     if (flagl)
     {
@@ -129,7 +129,7 @@ void PeekHandle(char *Location, int flaga, int flagl)
                 int blk = GetBlockSize(temp, en->d_name);
                 if (blk < 0)
                 {
-                    return;
+                    return -1;
                 }
                 sum += blk;
             }
@@ -154,9 +154,10 @@ void PeekHandle(char *Location, int flaga, int flagl)
         index++;
     }
     free(files);
+    return 0;
 }
 
-void ProcessPeek(char **Arguments)
+int ProcessPeek(char **Arguments)
 {
     int flagindex = 1;
     int flaga = 0;
@@ -176,17 +177,18 @@ void ProcessPeek(char **Arguments)
             else
             {
                 PrintError("Invalid Flag: %c\n", Arguments[flagindex][i]);
-                return;
+                return -1;
             }
         }
         flagindex++;
     }
     if (Arguments[flagindex] == NULL)
     {
-        PeekHandle(".", flaga, flagl);
+        return PeekHandle(".", flaga, flagl);
     }
     else
     {
-        PeekHandle(Arguments[flagindex], flaga, flagl);
+        return PeekHandle(Arguments[flagindex], flaga, flagl);
     }
+    return 0;
 }

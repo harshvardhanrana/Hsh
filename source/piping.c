@@ -14,6 +14,10 @@ int CheckRedirection(char *Input1, int Flag, char *OriginalInput)
             int redirectindex = index;
             if (Input[index] == '<') {
                 if (readflag) {
+                    dup2(ogout, 1);
+                    dup2(ogin, 0);
+                    close(ogout);
+                    close(ogin);
                     PrintError("Can only redirect input from file once!\n");
                     return 1;
                 }
@@ -21,6 +25,10 @@ int CheckRedirection(char *Input1, int Flag, char *OriginalInput)
             }
             else if (Input[index+1] == '>') {
                 if (writeflag) {
+                    dup2(ogout, 1);
+                    dup2(ogin, 0);
+                    close(ogout);
+                    close(ogin);
                     PrintError("Can only redirect output to file once!\n");
                     return 1;
                 }
@@ -29,6 +37,10 @@ int CheckRedirection(char *Input1, int Flag, char *OriginalInput)
             }
             else {
                 if (writeflag) {
+                    dup2(ogout, 1);
+                    dup2(ogin, 0);
+                    close(ogout);
+                    close(ogin);
                     PrintError("Can only redirect output to file once!\n");
                     return 1;
                 }
@@ -44,14 +56,23 @@ int CheckRedirection(char *Input1, int Flag, char *OriginalInput)
                 index++;
             }
             int fd;
+            int flagend = (Input[index] == '\0');
             Input[index] = '\0';
             if (readflag == 1) {
                 if ((fd = open(&Input[filestart], O_RDONLY, S_IWUSR | S_IRUSR)) < 0) {
+                    dup2(ogout, 1);
+                    dup2(ogin, 0);
+                    close(ogout);
+                    close(ogin);
                     PrintError("Error redirecting file: %s", &Input[filestart]);
                     return 1;
                 }
                 if (dup2(fd, STDIN_FILENO) < 0)
                 {
+                    dup2(ogout, 1);
+                    dup2(ogin, 0);
+                    close(ogout);
+                    close(ogin);
                     PrintError("Error redirecting input");
                     return 1;
                 }
@@ -59,11 +80,19 @@ int CheckRedirection(char *Input1, int Flag, char *OriginalInput)
             }
             else if (writeflag == 1) {
                 if ((fd = open(&Input[filestart], O_WRONLY | O_APPEND | O_CREAT, S_IWUSR | S_IRUSR)) < 0) {
+                    dup2(ogout, 1);
+                    dup2(ogin, 0);
+                    close(ogout);
+                    close(ogin);
                     PrintError("Error redirecting file: %s", &Input[filestart]);
                     return 1;
                 }
                 if (dup2(fd, STDOUT_FILENO) < 0)
                 {
+                    dup2(ogout, 1);
+                    dup2(ogin, 0);
+                    close(ogout);
+                    close(ogin);
                     PrintError("Error redirecting output");
                     return 1;
                 }
@@ -71,11 +100,19 @@ int CheckRedirection(char *Input1, int Flag, char *OriginalInput)
             }
             else if (writeflag == 2) {
                 if ((fd = open(&Input[filestart], O_WRONLY | O_TRUNC | O_CREAT, S_IWUSR | S_IRUSR)) < 0) {
+                    dup2(ogout, 1);
+                    dup2(ogin, 0);
+                    close(ogout);
+                    close(ogin);
                     PrintError("Error redirecting file: %s", &Input[filestart]);
                     return 1;
                 }
                 if (dup2(fd, STDOUT_FILENO) < 0)
                 {
+                    dup2(ogout, 1);
+                    dup2(ogin, 0);
+                    close(ogout);
+                    close(ogin);
                     PrintError("Error redirecting output");
                     return 1;
                 }
@@ -85,7 +122,8 @@ int CheckRedirection(char *Input1, int Flag, char *OriginalInput)
             Input[redirectindex] = '\0';
             strcpy(temp, Input);
             int fileend = index;
-            strcat(temp, &Input[index+1]);
+            if (!flagend)
+                strcat(temp, &Input[index+1]);
             strcpy(Input, temp);
             index = redirectindex-1;
             close(fd);
@@ -98,6 +136,9 @@ int CheckRedirection(char *Input1, int Flag, char *OriginalInput)
     close(ogin);
     return 0;
 }
+
+int OGIN;
+int OGOUT;
 
 void CreatePipe(int in, int out, char *Input, char *OriginalInput, int Flag)
 {
@@ -131,7 +172,11 @@ void ProcessPipe(char *Input, int Flag, char *OriginalInput)
         {
             pipefound = 1;
             Input[index] = '\0';
-            pipe(fd);
+            int pipeflag = pipe(fd);
+            if (pipeflag == -1) {
+                PrintError("Couldn't create pipe!\n");
+                return;
+            }
             CreatePipe(in, fd[1], &Input[StringStart], OriginalInput, Flag);
 
             close(fd[1]);

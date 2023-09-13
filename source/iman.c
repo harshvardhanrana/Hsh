@@ -70,31 +70,31 @@ int iman(char* Arg) {
 
     request_len = snprintf(request, MAX_REQUEST_LEN, request_template, Arg ,hostname);
     if (request_len >= MAX_REQUEST_LEN) {
-        fprintf(stderr, "request length large: %d\n", request_len);
+        PrintError("request length too large: %d\n", request_len);
         exit(EXIT_FAILURE);
     }
 
     /* Build the socket. */
     protoent = getprotobyname("tcp");
     if (protoent == NULL) {
-        perror("getprotobyname");
+        PrintError("Unable to get proto by name");
         exit(EXIT_FAILURE);
     }
     socket_file_descriptor = socket(AF_INET, SOCK_STREAM, protoent->p_proto);
     if (socket_file_descriptor == -1) {
-        perror("socket");
+        PrintError("Unable to open socket\n");
         exit(EXIT_FAILURE);
     }
 
     /* Build the address. */
     hostent = gethostbyname(hostname);
     if (hostent == NULL) {
-        fprintf(stderr, "error: gethostbyname(\"%s\")\n", hostname);
+        PrintError("Unable to resolve hostname (\"%s\")\n", hostname);
         return -4;
     }
     in_addr = inet_addr(inet_ntoa(*(struct in_addr*)*(hostent->h_addr_list)));
     if (in_addr == (in_addr_t)-1) {
-        fprintf(stderr, "error: inet_addr(\"%s\")\n", *(hostent->h_addr_list));
+        PrintError("inet_addr(\"%s\")\n", *(hostent->h_addr_list));
         return -3;
     }
     sockaddr_in.sin_addr.s_addr = in_addr;
@@ -103,7 +103,7 @@ int iman(char* Arg) {
 
     /* Actually connect. */
     if (connect(socket_file_descriptor, (struct sockaddr*)&sockaddr_in, sizeof(sockaddr_in)) == -1) {
-        perror("connect");
+        PrintError("Not able to connect!\n");
         return -2;
     }
 
@@ -187,6 +187,9 @@ int iman(char* Arg) {
     if (nbytes_total == -1) {
         perror("read");
         return -1;
+    }
+    if (countheads == 1) {
+        PrintError("No Page Found!\n");
     }
 
     close(socket_file_descriptor);

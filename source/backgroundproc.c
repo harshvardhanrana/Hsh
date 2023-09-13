@@ -49,10 +49,12 @@ struct BackgroundProc* GetProc(int pid) {
     return NULL;
 }
 
-void RemoveProcWithPid(int pid) {
+void RemoveProcWithPid(int pid, char* CommandName) {
     struct BackgroundProc* prev = GetProc(pid);
-    if (prev != NULL)
+    if (prev != NULL) {
+        strcpy(CommandName, prev->next->CommandName);
         RemoveProc(prev);
+    }
 }
 
 void KillAllProcs() {
@@ -77,7 +79,7 @@ void RemoveBackgroundBuffers() {
             PrintError("Background Process not found with %d\n", pid);
             return;
         }
-        if(WIFEXITED(status)){
+        if(WIFEXITED(status) || WIFSTOPPED(status)){
         	printf("%s exited normally (%d)\n", ChildPrev->next->CommandName, ChildPrev->next->Pid);
             RemoveProc(ChildPrev);
         }
@@ -100,8 +102,17 @@ int Activities() {
     int status;
     while (trav->next != NULL) {
         trav = trav->next;
-        waitpid(trav->Pid, &status, WNOHANG | WUNTRACED);
-        printf("%d : %s - %s\n", trav->Pid, trav->CommandName, WIFSTOPPED(status) ? "Stopped" : "Running");
+        char stat_path[BUFFERLENGTH];
+        snprintf(stat_path, sizeof stat_path, "/proc/%d/stat", trav->Pid);
+        FILE* fptr = fopen(stat_path, "r");
+        if (fptr == NULL) {
+            PrintError("Invalid Process ID: %d\n", trav->Pid);
+            return -1;
+        }
+        int dummy; char dummys[100];
+        char state;
+        fscanf(fptr, "%d %s %c", &dummy, dummys, &state);
+        printf("%d : %s - %s\n", trav->Pid, trav->CommandName, (state == 'Z' || state == 'T')? "Stopped" : "Running");
     }
     return 0;
 }

@@ -12,7 +12,7 @@ void GetProcLocation(int procid, char Buffer[], int BufferLength) {
     MakeRelative(Buffer, BufferLength);
 }
 
-void Proclore(char* Argument) {
+int Proclore(char* Argument) {
     int procid;
     if (Argument == NULL) {
         procid = getpid();
@@ -31,7 +31,7 @@ void Proclore(char* Argument) {
     FILE* fptr = fopen(stat_path, "r");
     if (fptr == NULL) {
         PrintError("Invalid Process ID: %d\n", procid);
-        return;
+        return -1;
     }
 
     printf("pid : %d\n", procid);
@@ -58,4 +58,5 @@ void Proclore(char* Argument) {
 
     
     printf("executable Path : %s\n", exe_path);
+    return 0;
 }

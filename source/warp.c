@@ -28,7 +28,7 @@ int WarpSeperate(const char* Location) {
     }
     
     if (status != 0) {
-        chdir(temp);
+        status = chdir(temp);
         return 0;
     }
     strcpy(PrevDirectory, temp);
@@ -37,7 +37,7 @@ int WarpSeperate(const char* Location) {
 }
 
 
-void warp(char** Arguments) {
+int warp(char** Arguments) {
     int status = 1;
     
 
@@ -73,4 +73,5 @@ void warp(char** Arguments) {
     if (status == 0) {
         printf("Warp Failed for %s\n", Arguments[index-1]);
     }
+    return (status == 0);
 }

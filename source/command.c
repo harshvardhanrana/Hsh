@@ -20,6 +20,7 @@ void ExecuteForegroundCommand(char **Arguments)
     if (CHILDPID == 0)
     {
         signal(SIGTSTP, SIG_DFL);
+        signal(SIGINT, SIG_DFL);
         int res = execvp(Arguments[0], Arguments);
         if (res == -1)
         {
@@ -83,15 +84,16 @@ void ProcessInput(char *Input, int Flag, char* OriginalInput)
         return;
     }
 
+    int status = 0;
     time_t start,end;
     start = time(NULL);
 
     if (strcmp(argv[0],"warp") == 0)
-        warp(argv);
+        status = warp(argv);
     else if (strcmp(argv[0],"peek") == 0)
-        ProcessPeek(argv);
+        status = ProcessPeek(argv);
     else if (strcmp(argv[0],"proclore") == 0)
-        Proclore(argv[1]);
+        status = Proclore(argv[1]);
     else if (strcmp(argv[0], "seek") == 0)
         seek(argv);
     else if (strcmp(argv[0], "activities") == 0)
@@ -132,6 +134,9 @@ void LoadCommand(char *Input, int Flag, char* OriginalInput) {
     if (Flag == 1) {
         int pid = fork();
         if (pid == 0) {
+            setpgid(0, 0);
+            signal(SIGTSTP, SIG_DFL);
+            signal(SIGINT, SIG_DFL);
             ProcessPipe(Input, 0, OriginalInput);
             exit(0);
         }

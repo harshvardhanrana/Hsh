@@ -6,5 +6,5 @@ void PrintError(const char *ErrorMessage, ...) {
     va_start(args, ErrorMessage);
     int rc = vsnprintf(buffer, sizeof(buffer), ErrorMessage, args);
     va_end(args);
-    printf("\033[1;31m[Error] %s\033[1;0m",buffer);
+    fprintf(stderr, "\033[1;31m[Error] %s\033[1;0m", buffer);
 }

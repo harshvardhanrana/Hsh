@@ -35,7 +35,6 @@
 #include "proclore.h"
 #include "seek.h"
 #include "errorhandle.h"
-#include "redirection.h"
 #include "piping.h"
 #include "signals.h"
 #include "main.h"
