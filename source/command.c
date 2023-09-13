@@ -143,6 +143,10 @@ void LoadCommand(char *Input, int Flag, char* OriginalInput) {
         else {
             char CommandName[128];
             int i = 0;
+            while (Input[i] == ' ' || Input[i] == '\t')
+                i++;
+            Input = &Input[i];
+            i = 0;
             while (Input[i] != '\0' && Input[i] != '|' && Input[i] != ' ' && Input[i] != '\t' &&
             Input[i] != '<' && Input[i] != '>') {
                 CommandName[i] = Input[i];
