@@ -1,6 +1,6 @@
 # Description
 
-Hash is a lightweight and versatile shell written in C. It is easy to edit and use.
+Hsh is a lightweight and versatile shell written in C. It is easy to edit and use.
 
 # Instruction
 
